@@ -51,6 +51,7 @@
                     FontWeight="Bold"
                     Text="{loc:LocaleLocator Name=Generic}" />
                 <controls:ThemeSettingSection />
+                <controls:PrimaryColorSettingSection />
                 <controls:StartupSettingSection />
                 <controls:LoggerSettingSection />
 

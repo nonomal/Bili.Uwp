@@ -35,6 +35,11 @@ namespace Richasy.Bili.ViewModels.Uwp
         public event EventHandler<AppTipNotificationEventArgs> RequestShowTip;
 
         /// <summary>
+        /// 请求改变主题色.
+        /// </summary>
+        public event EventHandler<string> RequestChangePrimaryColor;
+
+        /// <summary>
         /// <see cref="AppViewModel"/>的单例.
         /// </summary>
         public static AppViewModel Instance { get; } = new Lazy<AppViewModel>(() => new AppViewModel()).Value;

@@ -264,6 +264,9 @@
   <data name="Confirm" xml:space="preserve">
     <value>确认</value>
   </data>
+  <data name="Custom" xml:space="preserve">
+    <value>自定义</value>
+  </data>
   <data name="Danmaku" xml:space="preserve">
     <value>弹幕</value>
   </data>
@@ -733,6 +736,12 @@
   </data>
   <data name="PreviousView" xml:space="preserve">
     <value>上次观看：</value>
+  </data>
+  <data name="PrimaryColor" xml:space="preserve">
+    <value>主题色</value>
+  </data>
+  <data name="PrimaryColorDescription" xml:space="preserve">
+    <value>你可以使用自定义主题色来替代系统默认的颜色</value>
   </data>
   <data name="ProjectHomePage" xml:space="preserve">
     <value>项目主页</value>

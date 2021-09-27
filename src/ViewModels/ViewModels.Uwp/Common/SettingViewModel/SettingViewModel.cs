@@ -38,6 +38,7 @@ namespace Richasy.Bili.ViewModels.Uwp
             IsPreferHighQuality = ReadSetting(SettingNames.IsPreferHighQuality, false);
             SingleFastForwardAndRewindSpan = ReadSetting(SettingNames.SingleFastForwardAndRewindSpan, 30d);
             PreferCodecInit();
+            PrimaryColorInit();
             DoubleClickInit();
             PlayerModeInit();
             MTCControlModeInit();
@@ -57,6 +58,14 @@ namespace Richasy.Bili.ViewModels.Uwp
                     WriteSetting(SettingNames.AppTheme, AppTheme);
                     IsShowThemeRestartTip = AppTheme != _initializeTheme;
                     AppViewModel.Instance.InitializeTheme();
+                    break;
+                case nameof(IsCustomPrimaryColor):
+                    WriteSetting(SettingNames.IsCustomPrimaryColor, IsCustomPrimaryColor);
+                    CheckPrimaryColor();
+                    break;
+                case nameof(CustomPrimaryColor):
+                    WriteSetting(SettingNames.CustomPrimaryColor, CustomPrimaryColor);
+                    CheckPrimaryColor();
                     break;
                 case nameof(IsPrelaunch):
                     WriteSetting(SettingNames.IsPrelaunch, IsPrelaunch);
@@ -141,6 +150,13 @@ namespace Richasy.Bili.ViewModels.Uwp
             PreferCodec = ReadSetting(SettingNames.PreferCodec, PreferCodec.H264);
         }
 
+        private void PrimaryColorInit()
+        {
+            IsCustomPrimaryColor = _settingsToolkit.ReadLocalSetting(SettingNames.IsCustomPrimaryColor, false);
+            CustomPrimaryColor = _settingsToolkit.ReadLocalSetting(SettingNames.CustomPrimaryColor, "#ED5B8C");
+            CheckPrimaryColor();
+        }
+
         private void DoubleClickInit()
         {
             if (DoubleClickBehaviorCollection == null || DoubleClickBehaviorCollection.Count == 0)
@@ -153,6 +169,14 @@ namespace Richasy.Bili.ViewModels.Uwp
             }
 
             DoubleClickBehavior = ReadSetting(SettingNames.DoubleClickBehavior, DoubleClickBehavior.PlayPause);
+        }
+
+        private void CheckPrimaryColor()
+        {
+            if (IsCustomPrimaryColor && !string.IsNullOrEmpty(CustomPrimaryColor))
+            {
+                AppViewModel.Instance.ChangePrimaryColor(CustomPrimaryColor);
+            }
         }
 
         private void WriteSetting(SettingNames name, object value) => _settingsToolkit.WriteLocalSetting(name, value);

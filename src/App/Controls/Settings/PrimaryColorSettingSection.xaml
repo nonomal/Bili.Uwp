@@ -1,0 +1,68 @@
+﻿<local:SettingSectionControl
+    x:Class="Richasy.Bili.App.Controls.PrimaryColorSettingSection"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:exp="using:Richasy.ExpanderEx.Uwp"
+    xmlns:icons="using:Richasy.FluentIcon.Uwp"
+    xmlns:loc="using:Richasy.Bili.Locator.Uwp"
+    xmlns:local="using:Richasy.Bili.App.Controls"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
+    d:DesignHeight="300"
+    d:DesignWidth="400"
+    mc:Ignorable="d">
+
+    <exp:ExpanderEx>
+        <exp:ExpanderEx.Header>
+            <exp:ExpanderExWrapper Style="{StaticResource WrapperInExpanderHeaderStyle}">
+                <exp:ExpanderExWrapper.MainContent>
+                    <exp:ExpanderExDescriptor Title="{loc:LocaleLocator Name=PrimaryColor}" Description="{loc:LocaleLocator Name=PrimaryColorDescription}">
+                        <exp:ExpanderExDescriptor.Icon>
+                            <icons:RegularFluentIcon Symbol="ColorBackground20" />
+                        </exp:ExpanderExDescriptor.Icon>
+                    </exp:ExpanderExDescriptor>
+                </exp:ExpanderExWrapper.MainContent>
+            </exp:ExpanderExWrapper>
+        </exp:ExpanderEx.Header>
+        <exp:ExpanderEx.Content>
+            <exp:ExpanderExWrapper Style="{StaticResource WrapperInExpanderContentStyle}">
+                <exp:ExpanderExWrapper.MainContent>
+                    <muxc:RadioButtons x:Name="ColorRadioButtons" SelectionChanged="OnColorRadioButtonSelectionChanged">
+                        <RadioButton x:Name="SystemRadioButton" Content="{loc:LocaleLocator Name=FollowSystem}" />
+                        <RadioButton x:Name="CustomRadioButton" Content="{loc:LocaleLocator Name=Custom}" />
+                    </muxc:RadioButtons>
+                </exp:ExpanderExWrapper.MainContent>
+                <exp:ExpanderExWrapper.WrapContent>
+                    <Button
+                        Width="40"
+                        Height="40"
+                        Padding="0"
+                        VerticalAlignment="Bottom"
+                        IsEnabled="{x:Bind ViewModel.IsCustomPrimaryColor, Mode=OneWay}">
+                        <Rectangle
+                            Width="38"
+                            Height="38"
+                            Fill="{x:Bind ViewModel.CustomPrimaryColor, Mode=OneWay, Converter={StaticResource BrushConverter}}"
+                            RadiusX="4"
+                            RadiusY="4" />
+                        <Button.Flyout>
+                            <Flyout>
+                                <muxc:ColorPicker
+                                    x:Name="CustomColorPicker"
+                                    ColorChanged="OnColorChanged"
+                                    ColorSpectrumShape="Ring"
+                                    IsAlphaEnabled="False"
+                                    IsColorChannelTextInputVisible="False"
+                                    IsColorSliderVisible="False"
+                                    IsHexInputVisible="False"
+                                    Orientation="Vertical"
+                                    Color="{x:Bind ViewModel.CustomPrimaryColor, Mode=OneWay, Converter={StaticResource ColorConverter}}" />
+                            </Flyout>
+                        </Button.Flyout>
+                    </Button>
+                </exp:ExpanderExWrapper.WrapContent>
+            </exp:ExpanderExWrapper>
+        </exp:ExpanderEx.Content>
+    </exp:ExpanderEx>
+</local:SettingSectionControl>

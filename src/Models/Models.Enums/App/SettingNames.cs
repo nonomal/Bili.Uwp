@@ -34,6 +34,8 @@ namespace Richasy.Bili.Models.Enums
         DanmakuLocation,
         DanmakuColor,
         DoubleClickBehavior,
+        IsCustomPrimaryColor,
+        CustomPrimaryColor,
 #pragma warning disable SA1602 // Enumeration items should be documented
     }
 }

@@ -53,6 +53,18 @@ namespace Richasy.Bili.ViewModels.Uwp
         public string AppTheme { get; set; }
 
         /// <summary>
+        /// 是否是自定义主色.
+        /// </summary>
+        [Reactive]
+        public bool IsCustomPrimaryColor { get; set; }
+
+        /// <summary>
+        /// 自定义主色.
+        /// </summary>
+        [Reactive]
+        public string CustomPrimaryColor { get; set; }
+
+        /// <summary>
         /// 是否显示主题重启提示文本.
         /// </summary>
         [Reactive]

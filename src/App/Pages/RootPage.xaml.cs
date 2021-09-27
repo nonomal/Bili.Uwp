@@ -4,6 +4,7 @@ using System.ComponentModel;
 using Richasy.Bili.App.Controls;
 using Richasy.Bili.Models.App.Args;
 using Richasy.Bili.ViewModels.Uwp;
+using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Animation;
@@ -29,6 +30,7 @@ namespace Richasy.Bili.App.Pages
             this.InitializeComponent();
             this.Loaded += OnLoadedAsync;
             this.ViewModel.RequestShowTip += OnRequestShowTip;
+            this.ViewModel.RequestChangePrimaryColor += OnRequestChangePrimaryColor;
         }
 
         /// <summary>
@@ -114,6 +116,43 @@ namespace Richasy.Bili.App.Pages
         private void OnRequestShowTip(object sender, AppTipNotificationEventArgs e)
         {
             new TipPopup(e.Message).ShowAsync(e.Type);
+        }
+
+        private void OnRequestChangePrimaryColor(object sender, string e)
+        {
+            var color = Microsoft.Toolkit.Uwp.Helpers.ColorHelper.ToColor(e);
+            var dict = FindColorPaletteResources();
+            if (dict != null)
+            {
+                dict.Accent = color;
+            }
+        }
+
+        private ColorPaletteResources FindColorPaletteResources()
+        {
+            var theme = App.Current.RequestedTheme.ToString();
+            foreach (var themeDictionary in Application.Current.Resources.ThemeDictionaries)
+            {
+                if (themeDictionary.Key.ToString() == theme)
+                {
+                    if (themeDictionary.Value is ColorPaletteResources)
+                    {
+                        return themeDictionary.Value as ColorPaletteResources;
+                    }
+                    else if (themeDictionary.Value is ResourceDictionary targetDictionary)
+                    {
+                        foreach (var mergedDictionary in targetDictionary.MergedDictionaries)
+                        {
+                            if (mergedDictionary is ColorPaletteResources)
+                            {
+                                return mergedDictionary as ColorPaletteResources;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return null;
         }
     }
 }

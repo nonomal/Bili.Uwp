@@ -36,9 +36,14 @@ namespace Richasy.Bili.ViewModels.Uwp
         /// <param name="message">消息内容.</param>
         /// <param name="type">消息类型.</param>
         public void ShowTip(string message, InfoType type = InfoType.Information)
-        {
-            RequestShowTip?.Invoke(this, new Models.App.Args.AppTipNotificationEventArgs(message, type));
-        }
+            => RequestShowTip?.Invoke(this, new Models.App.Args.AppTipNotificationEventArgs(message, type));
+
+        /// <summary>
+        /// 修改主题色.
+        /// </summary>
+        /// <param name="colorStr">颜色哈希字符串.</param>
+        public void ChangePrimaryColor(string colorStr)
+            => RequestChangePrimaryColor?.Invoke(this, colorStr);
 
         /// <summary>
         /// 修改当前主内容标识.
