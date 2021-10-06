@@ -13,33 +13,27 @@
     mc:Ignorable="d">
 
     <Grid>
-        <muxc:NavigationView
-            x:Name="Nav"
-            IsBackButtonVisible="Collapsed"
-            IsPaneToggleButtonVisible="False"
-            IsSettingsVisible="False"
-            PaneDisplayMode="Top"
-            SelectionChanged="OnNavSelectionChanged">
-            <muxc:NavigationView.MenuItems>
+        <controls:AutoLayoutNavigationView x:Name="Nav" SelectionChanged="OnNavSelectionChanged">
+            <controls:AutoLayoutNavigationView.MenuItems>
                 <muxc:NavigationViewItem x:Name="VideoItem" Content="{loc:LocaleLocator Name=Videos}" />
                 <muxc:NavigationViewItem x:Name="AnimeItem" Content="{loc:LocaleLocator Name=Anime}" />
                 <muxc:NavigationViewItem x:Name="CinemaItem" Content="{loc:LocaleLocator Name=Cinema}" />
                 <muxc:NavigationViewItem x:Name="ArticleItem" Content="{loc:LocaleLocator Name=SpecialColumn}" />
-            </muxc:NavigationView.MenuItems>
-            <muxc:NavigationView.PaneFooter>
+            </controls:AutoLayoutNavigationView.MenuItems>
+            <controls:AutoLayoutNavigationView.PaneFooter>
                 <Button
                     x:Name="RefreshButton"
                     Margin="{x:Bind CoreViewModel.PageRightPadding, Mode=OneWay}"
                     Click="OnRefreshButtonClickAsync">
                     <controls:IconTextBlock Symbol="ArrowRepeatAll16" Text="{loc:LocaleLocator Name=RefreshCurrentSection}" />
                 </Button>
-            </muxc:NavigationView.PaneFooter>
+            </controls:AutoLayoutNavigationView.PaneFooter>
             <Grid Padding="0,12,0,0">
                 <controls:VideoFavoritePanel x:Name="VideoPanel" Visibility="Collapsed" />
                 <controls:PgcFavoritePanel x:Name="AnimePanel" Visibility="Collapsed" />
                 <controls:PgcFavoritePanel x:Name="CinemaPanel" Visibility="Collapsed" />
                 <controls:ArticleFavoritePanel x:Name="ArticlePanel" Visibility="Collapsed" />
             </Grid>
-        </muxc:NavigationView>
+        </controls:AutoLayoutNavigationView>
     </Grid>
 </pages:AppPage>

@@ -52,16 +52,12 @@
                 Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
                 Text="{x:Bind ViewModel.Keyword, Mode=OneWay}" />
         </TextBlock>
-        <muxc:NavigationView
+        <controls:AutoLayoutNavigationView
             x:Name="Nav"
             Grid.Row="1"
             HorizontalAlignment="Stretch"
-            IsBackButtonVisible="Collapsed"
-            IsPaneToggleButtonVisible="False"
-            IsSettingsVisible="False"
-            ItemInvoked="OnNavItemInvokedAsync"
-            PaneDisplayMode="Top">
-            <muxc:NavigationView.MenuItems>
+            ItemInvoked="OnNavItemInvokedAsync">
+            <controls:AutoLayoutNavigationView.MenuItems>
                 <muxc:NavigationViewItem
                     x:Name="VideoNavItem"
                     Content="{loc:LocaleLocator Name=Videos}"
@@ -92,7 +88,7 @@
                     Content="{loc:LocaleLocator Name=SpecialColumn}"
                     IsEnabled="{x:Bind ViewModel.ArticleModule.IsEnabled, Mode=OneWay}"
                     Tag="{x:Bind ViewModel.ArticleModule, Mode=OneWay}" />
-            </muxc:NavigationView.MenuItems>
+            </controls:AutoLayoutNavigationView.MenuItems>
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -130,6 +126,6 @@
                     </Grid>
                 </ScrollViewer>
             </Grid>
-        </muxc:NavigationView>
+        </controls:AutoLayoutNavigationView>
     </Grid>
 </pages:AppPage>

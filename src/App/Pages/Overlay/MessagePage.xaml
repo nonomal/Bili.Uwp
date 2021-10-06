@@ -39,16 +39,12 @@
             HorizontalAlignment="Left"
             Text="{loc:LocaleLocator Name=Message}"
             TextTrimming="CharacterEllipsis" />
-        <muxc:NavigationView
+        <controls:AutoLayoutNavigationView
             x:Name="Nav"
             Grid.Row="1"
             HorizontalAlignment="Stretch"
-            IsBackButtonVisible="Collapsed"
-            IsPaneToggleButtonVisible="False"
-            IsSettingsVisible="False"
-            ItemInvoked="OnNavItemInvokedAsync"
-            PaneDisplayMode="Top">
-            <muxc:NavigationView.MenuItems>
+            ItemInvoked="OnNavItemInvokedAsync">
+            <controls:AutoLayoutNavigationView.MenuItems>
                 <muxc:NavigationViewItem x:Name="ReplyMeNavItem" Content="{loc:LocaleLocator Name=ReplyMe}">
                     <muxc:NavigationViewItem.InfoBadge>
                         <muxc:InfoBadge Visibility="{x:Bind ViewModel.NewReplyMessageCount, Mode=OneWay, Converter={StaticResource NumberToVisibilityConverter}}" Value="{x:Bind ViewModel.NewReplyMessageCount, Mode=OneWay}" />
@@ -64,9 +60,9 @@
                         <muxc:InfoBadge Visibility="{x:Bind ViewModel.NewLikeMessageCount, Mode=OneWay, Converter={StaticResource NumberToVisibilityConverter}}" Value="{x:Bind ViewModel.NewLikeMessageCount, Mode=OneWay}" />
                     </muxc:NavigationViewItem.InfoBadge>
                 </muxc:NavigationViewItem>
-            </muxc:NavigationView.MenuItems>
+            </controls:AutoLayoutNavigationView.MenuItems>
 
-            <muxc:NavigationView.PaneFooter>
+            <controls:AutoLayoutNavigationView.PaneFooter>
                 <Button
                     x:Name="RefreshButton"
                     Margin="{StaticResource DefaultContainerPadding}"
@@ -74,7 +70,7 @@
                     Click="OnRefreshButtonClickAsync">
                     <controls:IconTextBlock Symbol="ArrowSync16" Text="{loc:LocaleLocator Name=Refresh}" />
                 </Button>
-            </muxc:NavigationView.PaneFooter>
+            </controls:AutoLayoutNavigationView.PaneFooter>
 
             <Grid>
                 <ScrollViewer
@@ -95,6 +91,6 @@
                     Text="{x:Bind ViewModel.ErrorText, Mode=OneWay}"
                     Visibility="{x:Bind ViewModel.IsError, Mode=OneWay}" />
             </Grid>
-        </muxc:NavigationView>
+        </controls:AutoLayoutNavigationView>
     </Grid>
 </pages:AppPage>

@@ -39,6 +39,7 @@
     <Compile Include="Controls\App\TwoLineButton\TwoLineButton.cs" />
     <Compile Include="Controls\App\CenterPopup\CenterPopup.cs" />
     <Compile Include="Controls\App\CenterPopup\CenterPopup.Properties.cs" />
+    <Compile Include="Controls\App\AutoLayoutNavigationView.cs" />
     <Compile Include="Controls\Danmaku\DanmakuSendOptions.xaml.cs">
       <DependentUpon>DanmakuSendOptions.xaml</DependentUpon>
     </Compile>

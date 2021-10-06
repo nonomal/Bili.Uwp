@@ -30,25 +30,21 @@
                 </VisualState>
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
-        <muxc:NavigationView
+        <controls:AutoLayoutNavigationView
             x:Name="SpecialColumnNavigationView"
-            IsBackButtonVisible="Collapsed"
-            IsPaneToggleButtonVisible="False"
-            IsSettingsVisible="False"
             ItemInvoked="OnSpecialColumnNavigationViewItemInvoked"
             MenuItemsSource="{x:Bind ViewModel.CategoryCollection}"
-            PaneDisplayMode="Top"
             Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay, Converter={StaticResource BoolToVisibilityReverseConverter}}">
-            <muxc:NavigationView.MenuItemTemplate>
+            <controls:AutoLayoutNavigationView.MenuItemTemplate>
                 <DataTemplate x:DataType="uwp:SpecialColumnCategoryViewModel">
                     <muxc:NavigationViewItem
                         Content="{x:Bind Title, Mode=OneWay}"
                         MenuItemsSource="{x:Bind Children, Mode=OneWay}"
                         Tag="{x:Bind Mode=OneWay}" />
                 </DataTemplate>
-            </muxc:NavigationView.MenuItemTemplate>
+            </controls:AutoLayoutNavigationView.MenuItemTemplate>
 
-            <muxc:NavigationView.Content>
+            <controls:AutoLayoutNavigationView.Content>
                 <ScrollViewer
                     x:Name="ContentScrollViewer"
                     Margin="0,8,0,0"
@@ -152,8 +148,8 @@
                         <controls:OverlayLoadingPanel IsBarActive="{x:Bind ViewModel.CurrentCategory.IsDeltaLoading, Mode=OneWay}" IsRingActive="{x:Bind ViewModel.CurrentCategory.IsInitializeLoading, Mode=OneWay}" />
                     </Grid>
                 </ScrollViewer>
-            </muxc:NavigationView.Content>
-        </muxc:NavigationView>
+            </controls:AutoLayoutNavigationView.Content>
+        </controls:AutoLayoutNavigationView>
 
         <controls:OverlayLoadingPanel IsRingActive="{x:Bind ViewModel.IsLoading, Mode=OneWay}" />
     </Grid>

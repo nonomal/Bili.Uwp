@@ -33,16 +33,12 @@
                 </VisualState>
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
-        <muxc:NavigationView
+        <controls:AutoLayoutNavigationView
             x:Name="RootNavView"
-            IsBackButtonVisible="Collapsed"
-            IsPaneToggleButtonVisible="False"
-            IsSettingsVisible="False"
             ItemInvoked="OnRootNavViewItemInvoked"
             MenuItemsSource="{x:Bind ViewModel.TabCollection, Mode=OneWay}"
-            PaneDisplayMode="Top"
             Visibility="{x:Bind ViewModel.IsInitializeLoading, Mode=OneWay, Converter={StaticResource BoolToVisibilityReverseConverter}}">
-            <muxc:NavigationView.MenuItemTemplate>
+            <controls:AutoLayoutNavigationView.MenuItemTemplate>
                 <DataTemplate x:DataType="uwp:PgcTabViewModel">
                     <muxc:NavigationViewItem Content="{x:Bind}" Tag="{x:Bind Id}">
                         <muxc:NavigationViewItem.ContentTemplate>
@@ -52,8 +48,8 @@
                         </muxc:NavigationViewItem.ContentTemplate>
                     </muxc:NavigationViewItem>
                 </DataTemplate>
-            </muxc:NavigationView.MenuItemTemplate>
-            <muxc:NavigationView.PaneFooter>
+            </controls:AutoLayoutNavigationView.MenuItemTemplate>
+            <controls:AutoLayoutNavigationView.PaneFooter>
                 <StackPanel
                     x:Name="NavHeaderAdditionalContainer"
                     Padding="{x:Bind CoreViewModel.PageRightPadding, Mode=OneWay}"
@@ -66,8 +62,8 @@
                         <controls:IconTextBlock Symbol="Clock16" Text="{loc:LocaleLocator Name=TimeChart}" />
                     </Button>
                 </StackPanel>
-            </muxc:NavigationView.PaneFooter>
-            <muxc:NavigationView.Content>
+            </controls:AutoLayoutNavigationView.PaneFooter>
+            <controls:AutoLayoutNavigationView.Content>
                 <Grid>
                     <ScrollViewer
                         x:Name="ContentScrollViewer"
@@ -232,7 +228,7 @@
                         Text="{x:Bind ViewModel.CurrentTab.ErrorText, Mode=OneWay}"
                         Visibility="{x:Bind ViewModel.CurrentTab.IsError, Mode=OneWay}" />
                 </Grid>
-            </muxc:NavigationView.Content>
-        </muxc:NavigationView>
+            </controls:AutoLayoutNavigationView.Content>
+        </controls:AutoLayoutNavigationView>
     </Grid>
 </local:AppPage>

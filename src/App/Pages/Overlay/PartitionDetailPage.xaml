@@ -52,16 +52,12 @@
                 FontWeight="Bold"
                 Text="{x:Bind ViewModel.Title, Mode=OneWay}" />
         </StackPanel>
-        <muxc:NavigationView
+        <controls:AutoLayoutNavigationView
             x:Name="DetailNavigationView"
             Grid.Row="1"
-            IsBackButtonVisible="Collapsed"
-            IsPaneToggleButtonVisible="False"
-            IsSettingsVisible="False"
             ItemInvoked="OnDetailNavigationViewItemInvokedAsync"
-            MenuItemsSource="{x:Bind ViewModel.SubPartitionCollection}"
-            PaneDisplayMode="Top">
-            <muxc:NavigationView.MenuItemTemplate>
+            MenuItemsSource="{x:Bind ViewModel.SubPartitionCollection}">
+            <controls:AutoLayoutNavigationView.MenuItemTemplate>
                 <DataTemplate x:DataType="uwp:SubPartitionViewModel">
                     <muxc:NavigationViewItem Content="{x:Bind}" Tag="{x:Bind SubPartitionId}">
                         <muxc:NavigationViewItem.ContentTemplate>
@@ -71,8 +67,8 @@
                         </muxc:NavigationViewItem.ContentTemplate>
                     </muxc:NavigationViewItem>
                 </DataTemplate>
-            </muxc:NavigationView.MenuItemTemplate>
-            <muxc:NavigationView.Content>
+            </controls:AutoLayoutNavigationView.MenuItemTemplate>
+            <controls:AutoLayoutNavigationView.Content>
                 <Grid>
                     <ScrollViewer
                         x:Name="ContentScrollViewer"
@@ -149,7 +145,7 @@
                         Text="{x:Bind ViewModel.CurrentSelectedSubPartition.ErrorText, Mode=OneWay}"
                         Visibility="{x:Bind ViewModel.CurrentSelectedSubPartition.IsError, Mode=OneWay}" />
                 </Grid>
-            </muxc:NavigationView.Content>
-        </muxc:NavigationView>
+            </controls:AutoLayoutNavigationView.Content>
+        </controls:AutoLayoutNavigationView>
     </Grid>
 </pages:AppPage>

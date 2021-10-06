@@ -30,17 +30,13 @@
                 </VisualState>
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
-        <muxc:NavigationView
+        <controls:AutoLayoutNavigationView
             x:Name="RankNavigationView"
-            IsBackButtonVisible="Collapsed"
-            IsPaneToggleButtonVisible="False"
-            IsSettingsVisible="False"
             ItemInvoked="OnDetailNavigationViewItemInvokedAsync"
-            MenuItemsSource="{x:Bind ViewModel.PartitionCollection}"
-            PaneDisplayMode="Top">
-            <muxc:NavigationView.MenuItemTemplate>
+            MenuItemsSource="{x:Bind ViewModel.PartitionCollection}">
+            <controls:AutoLayoutNavigationView.DesktopTemplate>
                 <DataTemplate x:DataType="other:RankPartition">
-                    <muxc:NavigationViewItem>
+                    <muxc:NavigationViewItem DataContext="{x:Bind}">
                         <StackPanel Orientation="Horizontal" Spacing="8">
                             <Image
                                 Width="20"
@@ -54,9 +50,15 @@
                         </StackPanel>
                     </muxc:NavigationViewItem>
                 </DataTemplate>
-            </muxc:NavigationView.MenuItemTemplate>
+            </controls:AutoLayoutNavigationView.DesktopTemplate>
 
-            <muxc:NavigationView.Content>
+            <controls:AutoLayoutNavigationView.XboxTemplate>
+                <DataTemplate x:DataType="other:RankPartition">
+                    <muxc:NavigationViewItem Content="{x:Bind PartitionName}" DataContext="{x:Bind}" />
+                </DataTemplate>
+            </controls:AutoLayoutNavigationView.XboxTemplate>
+
+            <controls:AutoLayoutNavigationView.Content>
                 <Grid Margin="0,4,0,0">
                     <ScrollViewer
                         x:Name="ContentScrollViewer"
@@ -100,8 +102,8 @@
                         Text="{x:Bind ViewModel.ErrorText, Mode=OneWay}"
                         Visibility="{x:Bind ViewModel.IsError, Mode=OneWay}" />
                 </Grid>
-            </muxc:NavigationView.Content>
-        </muxc:NavigationView>
+            </controls:AutoLayoutNavigationView.Content>
+        </controls:AutoLayoutNavigationView>
 
         <muxc:ProgressRing
             x:Name="InitializeRing"

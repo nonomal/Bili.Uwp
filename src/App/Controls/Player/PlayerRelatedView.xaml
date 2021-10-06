@@ -46,15 +46,11 @@
                 </VisualState>
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
-        <muxc:NavigationView
+        <local:AutoLayoutNavigationView
             x:Name="Nav"
             Margin="0,-12,0,0"
-            IsBackButtonVisible="Collapsed"
-            IsPaneToggleButtonVisible="False"
-            IsSettingsVisible="False"
-            PaneDisplayMode="Top"
             SelectionChanged="OnNavSelectionChanged">
-            <muxc:NavigationView.MenuItems>
+            <local:AutoLayoutNavigationView.MenuItems>
                 <muxc:NavigationViewItem
                     x:Name="PartsItem"
                     Content="{loc:LocaleLocator Name=Parts}"
@@ -83,7 +79,7 @@
                     x:Name="SectionItem"
                     Content="{loc:LocaleLocator Name=Sections}"
                     Visibility="{x:Bind ViewModel.IsShowSection, Mode=OneWay}" />
-            </muxc:NavigationView.MenuItems>
+            </local:AutoLayoutNavigationView.MenuItems>
 
             <Grid x:Name="DetailGrid" Width="360">
                 <related:RelatedVideoView
@@ -115,7 +111,7 @@
                     x:Load="{x:Bind ViewModel.IsShowReply, Mode=OneWay}"
                     Visibility="Collapsed" />
             </Grid>
-        </muxc:NavigationView>
+        </local:AutoLayoutNavigationView>
 
     </Grid>
 </local:PlayerComponent>

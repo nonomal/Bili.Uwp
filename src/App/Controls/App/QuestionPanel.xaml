@@ -31,19 +31,16 @@
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
         <Grid Padding="16,0,16,16">
-            <muxc:NavigationView
+            <local:AutoLayoutNavigationView
                 x:Name="Nav"
-                IsBackButtonVisible="Collapsed"
-                IsPaneToggleButtonVisible="False"
-                IsSettingsVisible="False"
+                IsForceTop="True"
                 MenuItemsSource="{x:Bind ViewModel.QuestionCollection, Mode=OneWay}"
-                PaneDisplayMode="Top"
                 SelectedItem="{x:Bind ViewModel.CurrentQuestionModule, Mode=TwoWay}">
-                <muxc:NavigationView.MenuItemTemplate>
+                <local:AutoLayoutNavigationView.MenuItemTemplate>
                     <DataTemplate x:DataType="other:QuestionModule">
                         <muxc:NavigationViewItem Content="{x:Bind Name}" Tag="{x:Bind Id}" />
                     </DataTemplate>
-                </muxc:NavigationView.MenuItemTemplate>
+                </local:AutoLayoutNavigationView.MenuItemTemplate>
                 <ScrollViewer
                     x:Name="QuestionScrollView"
                     HorizontalScrollMode="Disabled"
@@ -85,7 +82,7 @@
                         </muxc:ItemsRepeater.Layout>
                     </muxc:ItemsRepeater>
                 </ScrollViewer>
-            </muxc:NavigationView>
+            </local:AutoLayoutNavigationView>
         </Grid>
     </local:CardPanel>
 </UserControl>
