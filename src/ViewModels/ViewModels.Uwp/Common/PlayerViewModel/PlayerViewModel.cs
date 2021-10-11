@@ -7,9 +7,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
-using FFmpegInterop;
 using Richasy.Bili.Locator.Uwp;
-using Richasy.Bili.Models.App.Constants;
 using Richasy.Bili.Models.BiliBili;
 using Richasy.Bili.Models.Enums;
 using Richasy.Bili.ViewModels.Uwp.Common;
@@ -48,11 +46,6 @@ namespace Richasy.Bili.ViewModels.Uwp
             _subtitleList = new List<SubtitleItem>();
             _lastReportProgress = TimeSpan.Zero;
 
-            _liveFFConfig = new FFmpegInteropConfig();
-            _liveFFConfig.FFmpegOptions.Add("rtsp_transport", "tcp");
-            _liveFFConfig.FFmpegOptions.Add("user_agent", ServiceConstants.DefaultUserAgentString);
-            _liveFFConfig.FFmpegOptions.Add("referer", "https://live.bilibili.com/");
-
             ServiceLocator.Instance.LoadService(out _numberToolkit)
                                    .LoadService(out _resourceToolkit)
                                    .LoadService(out _settingsToolkit)
@@ -84,15 +77,9 @@ namespace Richasy.Bili.ViewModels.Uwp
         /// 保存媒体控件.
         /// </summary>
         /// <param name="playerControl">标准播放器控件.</param>
-        /// <param name="classicPlayer">经典播放器控件.</param>
-        public void ApplyMediaControl(MediaPlayerElement playerControl, MediaElement classicPlayer)
+        public void ApplyMediaControl(MediaPlayerElement playerControl)
         {
             BiliPlayer = playerControl;
-            ClassicPlayer = classicPlayer;
-            ClassicPlayer.MediaOpened += OnClassicMediaOpened;
-            ClassicPlayer.MediaFailed += OnClassicMediaFailedAsync;
-            ClassicPlayer.MediaEnded += OnClassicMediaEndedAsync;
-            ClassicPlayer.CurrentStateChanged += OnClassicStateChangedAsync;
         }
 
         /// <summary>
@@ -340,11 +327,7 @@ namespace Richasy.Bili.ViewModels.Uwp
 
             CheckFormatSelection();
 
-            if (isFlv)
-            {
-                await InitializeFlvVideoAsync();
-            }
-            else if (_currentVideo != null)
+            if (_currentVideo != null && !isFlv)
             {
                 await InitializeOnlineDashVideoAsync();
             }
@@ -366,7 +349,7 @@ namespace Richasy.Bili.ViewModels.Uwp
 
             if (playInfo != null)
             {
-                await InitializeLivePlayInformationAsync(playInfo);
+                InitializeLivePlayInformationAsync(playInfo);
             }
             else
             {
@@ -380,14 +363,13 @@ namespace Richasy.Bili.ViewModels.Uwp
         /// 修改直播线路.
         /// </summary>
         /// <param name="order">线路序号.</param>
-        /// <returns><see cref="Task"/>.</returns>
-        public async Task ChangeLivePlayLineAsync(int order)
+        public void ChangeLivePlayLine(int order)
         {
             var playLine = LivePlayLineCollection.Where(p => p.Data.Order == order).FirstOrDefault()?.Data;
             if (playLine != null)
             {
                 CurrentPlayLine = playLine;
-                await InitializeLiveDashAsync(CurrentPlayLine.Url);
+                InitializeLiveDash(CurrentPlayLine.Url);
             }
         }
 
@@ -396,37 +378,17 @@ namespace Richasy.Bili.ViewModels.Uwp
         /// </summary>
         public void ClearPlayer()
         {
-            if (BiliPlayer != null)
-            {
-                BiliPlayer.SetMediaPlayer(null);
-            }
-
             if (_currentVideoPlayer != null)
             {
-                if (_currentVideoPlayer.PlaybackSession.CanPause)
-                {
-                    _currentVideoPlayer.Pause();
-                }
-
-                if (_currentPlaybackItem != null)
-                {
-                    _currentPlaybackItem.Source.Dispose();
-                    _currentPlaybackItem = null;
-                }
-
-                _currentVideoPlayer.Source = null;
+                _currentVideoPlayer.Stop();
+                _currentVideoPlayer.Dispose();
+                _currentVideoPlayer = null;
             }
 
             _lastReportProgress = TimeSpan.Zero;
             _progressTimer.Stop();
             _heartBeatTimer.Stop();
             _subtitleTimer.Stop();
-
-            if (_interopMSS != null)
-            {
-                _interopMSS.Dispose();
-                _interopMSS = null;
-            }
 
             PlayerStatus = PlayerStatus.NotLoad;
         }
@@ -629,9 +591,9 @@ namespace Richasy.Bili.ViewModels.Uwp
                     _settingsToolkit.WriteLocalSetting(SettingNames.CanShowSubtitle, CanShowSubtitle);
                     break;
                 case nameof(PlaybackRate):
-                    if (_currentVideoPlayer != null && _currentVideoPlayer.PlaybackSession != null)
+                    if (_currentVideoPlayer != null)
                     {
-                        _currentVideoPlayer.PlaybackSession.PlaybackRate = PlaybackRate;
+                        _currentVideoPlayer.SetRate((float)PlaybackRate);
                     }
 
                     _settingsToolkit.WriteLocalSetting(SettingNames.PlaybackRate, PlaybackRate);

@@ -27,17 +27,17 @@ namespace Richasy.Bili.ViewModels.Uwp
 
             try
             {
-                var currentPos = _currentVideoPlayer.PlaybackSession.Position;
-                if (currentPos.TotalSeconds > seconds)
+                var currentPos = GetCurrentPosition();
+                if (currentPos > seconds)
                 {
-                    currentPos -= TimeSpan.FromSeconds(seconds);
+                    currentPos -= seconds;
                 }
                 else
                 {
-                    currentPos = TimeSpan.Zero;
+                    currentPos = 0;
                 }
 
-                _currentVideoPlayer.PlaybackSession.Position = currentPos;
+                _currentVideoPlayer.Position = (float)(currentPos * 1000 / _currentVideoPlayer.Length);
             }
             catch (Exception)
             {
@@ -57,18 +57,18 @@ namespace Richasy.Bili.ViewModels.Uwp
 
             try
             {
-                var duration = _currentVideoPlayer.PlaybackSession.NaturalDuration;
-                var currentPos = _currentVideoPlayer.PlaybackSession.Position;
-                if ((duration - currentPos).TotalSeconds > seconds)
+                var duration = _currentVideoPlayer.Length / 1000;
+                var currentPos = GetCurrentPosition();
+                if (duration - currentPos > seconds)
                 {
-                    currentPos += TimeSpan.FromSeconds(seconds);
+                    currentPos += seconds;
                 }
                 else
                 {
                     currentPos = duration;
                 }
 
-                _currentVideoPlayer.PlaybackSession.Position = currentPos;
+                _currentVideoPlayer.Position = (float)(currentPos * 1000 / _currentVideoPlayer.Length);
             }
             catch (Exception)
             {

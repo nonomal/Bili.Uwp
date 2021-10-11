@@ -4,14 +4,13 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Bilibili.App.View.V1;
-using FFmpegInterop;
+using LibVLCSharp.Shared;
 using ReactiveUI.Fody.Helpers;
 using Richasy.Bili.Controller.Uwp;
 using Richasy.Bili.Controller.Uwp.Interfaces;
 using Richasy.Bili.Models.BiliBili;
 using Richasy.Bili.Models.Enums;
 using Richasy.Bili.Toolkit.Interfaces;
-using Windows.Media.Playback;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -29,8 +28,6 @@ namespace Richasy.Bili.ViewModels.Uwp
         private readonly IFileToolkit _fileToolkit;
         private readonly ILoggerModule _logger;
 
-        private readonly FFmpegInteropConfig _liveFFConfig;
-
         private long _videoId;
         private ViewReply _videoDetail;
         private PgcDisplayInformation _pgcDetail;
@@ -40,8 +37,6 @@ namespace Richasy.Bili.ViewModels.Uwp
         private TimeSpan _lastReportProgress;
         private VideoType _videoType;
         private TimeSpan _initializeProgress;
-        private FFmpegInteropMSS _interopMSS;
-        private MediaPlaybackItem _currentPlaybackItem;
 
         private DashItem _currentAudio;
         private DashItem _currentVideo;
@@ -83,11 +78,6 @@ namespace Richasy.Bili.ViewModels.Uwp
         public MediaPlayerElement BiliPlayer { get; private set; }
 
         /// <summary>
-        /// 经典播放器.
-        /// </summary>
-        public MediaElement ClassicPlayer { get; private set; }
-
-        /// <summary>
         /// 偏好的解码模式.
         /// </summary>
         public PreferCodec PreferCodec => SettingViewModel.Instance.PreferCodec;
@@ -108,10 +98,9 @@ namespace Richasy.Bili.ViewModels.Uwp
         public CoreDispatcher Dispatcher { get; set; }
 
         /// <summary>
-        /// 是否使用经典播放器.
+        /// VLC播放器.
         /// </summary>
-        [Reactive]
-        public bool IsClassicPlayer { get; set; }
+        public LibVLC VLC { get; set; }
 
         /// <summary>
         /// 详情是否可以加载（用于优化页面跳转的加载时间）.

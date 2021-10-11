@@ -96,7 +96,7 @@ namespace Richasy.Bili.App.Controls
 
             if (_livePlayLineListView != null)
             {
-                _livePlayLineListView.SelectionChanged += OnLivePlayLineListViewSelectionChangedAsync;
+                _livePlayLineListView.SelectionChanged += OnLivePlayLineListViewSelectionChanged;
             }
 
             if (_backSkipButton != null)
@@ -177,11 +177,11 @@ namespace Richasy.Bili.App.Controls
             }
         }
 
-        private async void OnLivePlayLineListViewSelectionChangedAsync(object sender, SelectionChangedEventArgs e)
+        private void OnLivePlayLineListViewSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (_livePlayLineListView.SelectedItem is LivePlayLineViewModel data && ViewModel.CurrentPlayLine != data.Data)
             {
-                await ViewModel.ChangeLivePlayLineAsync(data.Data.Order);
+                ViewModel.ChangeLivePlayLine(data.Data.Order);
             }
         }
 

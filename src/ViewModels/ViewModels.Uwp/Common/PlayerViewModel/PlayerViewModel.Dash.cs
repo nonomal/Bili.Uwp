@@ -6,10 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using FFmpegInterop;
 using Richasy.Bili.Models.App.Constants;
-using Windows.Media.Core;
-using Windows.Media.Playback;
 using Windows.Media.Streaming.Adaptive;
 using Windows.Web.Http;
 
@@ -79,17 +76,11 @@ namespace Richasy.Bili.ViewModels.Uwp
                     _currentVideoPlayer = InitializeMediaPlayer();
                 }
 
-                if (_currentVideoPlayer.PlaybackSession != null)
+                if (_currentVideoPlayer != null)
                 {
-                    _initializeProgress = _currentVideoPlayer.PlaybackSession.Position;
+                    _initializeProgress = TimeSpan.FromMilliseconds(_currentVideoPlayer.Position * _currentVideoPlayer.Length);
                 }
 
-                var mediaSource = MediaSource.CreateFromAdaptiveMediaSource(soure.MediaSource);
-                _currentPlaybackItem = new MediaPlaybackItem(mediaSource);
-                _currentVideoPlayer.Source = _currentPlaybackItem;
-
-                IsClassicPlayer = false;
-                BiliPlayer.SetMediaPlayer(_currentVideoPlayer);
                 MediaPlayerUpdated?.Invoke(this, EventArgs.Empty);
             }
             catch (Exception)
@@ -99,59 +90,22 @@ namespace Richasy.Bili.ViewModels.Uwp
             }
         }
 
-        private async Task InitializeFlvVideoAsync()
+        private void InitializeLiveDash(string url)
         {
             try
             {
-                var playList = new SYEngine.Playlist(SYEngine.PlaylistTypes.NetworkHttp);
-                var config = default(SYEngine.PlaylistNetworkConfigs);
-                config.DownloadRetryOnFail = true;
-                config.HttpCookie = string.Empty;
-                config.UniqueId = string.Empty;
-                config.HttpUserAgent = ServiceConstants.DefaultUserAgentString;
-                if (IsPgc && CurrentPgcEpisode != null)
+                if (_currentVideoPlayer == null)
                 {
-                    config.HttpReferer = $"https://www.bilibili.com/bangumi/play/ep{CurrentPgcEpisode.Id}";
-                }
-                else
-                {
-                    config.HttpReferer = string.Empty;
+                    _currentVideoPlayer = InitializeMediaPlayer();
                 }
 
-                playList.NetworkConfigs = config;
-                foreach (var item in _flvList)
+                using (var media = new LibVLCSharp.Shared.Media(VLC, new Uri(url)))
                 {
-                    playList.Append(item.Url, item.Size, float.Parse((item.Length / 1000.0).ToString()));
+                    media.AddOption("http-referrer=https://live.bilibili.com");
+                    media.AddOption("http-user-agent=Mozilla/5.0 BiliDroid/1.12.0 (bbcallen@gmail.com)");
+                    media.StateChanged += OnMediaPlayerCurrentStateChangedAsync;
+                    _currentVideoPlayer.Play(media);
                 }
-
-                if (ClassicPlayer != null)
-                {
-                    _initializeProgress = ClassicPlayer.Position;
-                }
-
-                IsClassicPlayer = true;
-                ClassicPlayer.AutoPlay = IsAutoPlay;
-                ClassicPlayer.Source = await playList.SaveAndGetFileUriAsync();
-                MediaPlayerUpdated?.Invoke(this, EventArgs.Empty);
-            }
-            catch (Exception)
-            {
-                IsPlayInformationError = true;
-                PlayInformationErrorText = _resourceToolkit.GetLocaleString(Models.Enums.LanguageNames.RequestVideoFailed);
-            }
-        }
-
-        private async Task InitializeLiveDashAsync(string url)
-        {
-            try
-            {
-                if (_interopMSS != null)
-                {
-                    _interopMSS.Dispose();
-                    _interopMSS = null;
-                }
-
-                _interopMSS = await FFmpegInteropMSS.CreateFromUriAsync(url, _liveFFConfig);
             }
             catch (Exception)
             {
@@ -160,14 +114,6 @@ namespace Richasy.Bili.ViewModels.Uwp
                 return;
             }
 
-            _currentPlaybackItem = _interopMSS.CreateMediaPlaybackItem();
-            if (_currentVideoPlayer == null)
-            {
-                _currentVideoPlayer = InitializeMediaPlayer();
-            }
-
-            _currentVideoPlayer.Source = _currentPlaybackItem;
-            BiliPlayer.SetMediaPlayer(_currentVideoPlayer);
             MediaPlayerUpdated?.Invoke(this, EventArgs.Empty);
         }
 

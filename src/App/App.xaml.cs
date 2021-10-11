@@ -1,9 +1,6 @@
 ﻿// Copyright (c) Richasy. All rights reserved.
 
 using System;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
-using FFmpegInterop;
 using Richasy.Bili.Controller.Uwp.Interfaces;
 using Richasy.Bili.Locator.Uwp;
 using Richasy.Bili.Models.App.Constants;
@@ -22,7 +19,7 @@ namespace Richasy.Bili.App
     /// <summary>
     /// Provide application-specific behaviors to supplement the default application classes.
     /// </summary>
-    public sealed partial class App : Application, ILogProvider
+    public sealed partial class App : Application
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="App"/> class.
@@ -36,20 +33,11 @@ namespace Richasy.Bili.App
             ServiceLocator.Instance.GetService<IAppToolkit>()
                                    .InitializeTheme();
 
-            FFmpegInteropLogging.SetLogLevel(LogLevel.Error);
-            FFmpegInteropLogging.SetLogProvider(this);
-
             if (AppViewModel.Instance.IsXbox)
             {
                 // RequiresPointerMode = ApplicationRequiresPointerMode.WhenRequested;
                 FocusVisualKind = FocusVisualKind.Reveal;
             }
-        }
-
-        /// <inheritdoc/>
-        public void Log(LogLevel level, string message)
-        {
-            Debug.WriteLine($"{level} | {message}");
         }
 
         /// <summary>
@@ -73,12 +61,6 @@ namespace Richasy.Bili.App
 
         private void OnLaunchedOrActivated(IActivatedEventArgs e)
         {
-            // 用于解析Flv视频
-            if (RuntimeInformation.ProcessArchitecture != Architecture.Arm64)
-            {
-                _ = SYEngine.Core.Initialize();
-            }
-
             var appView = ApplicationView.GetForCurrentView();
             appView.SetPreferredMinSize(new Size(AppConstants.AppMinWidth, AppConstants.AppMinHeight));
             appView.SetDesiredBoundsMode(ApplicationViewBoundsMode.UseCoreWindow);

@@ -11,7 +11,6 @@ using Richasy.Bili.Models.BiliBili;
 using Richasy.Bili.Models.Enums;
 using Windows.Media.Playback;
 using Windows.UI.Xaml;
-using Windows.UI.Xaml.Media;
 
 namespace Richasy.Bili.ViewModels.Uwp
 {
@@ -22,7 +21,6 @@ namespace Richasy.Bili.ViewModels.Uwp
     {
         private void Reset()
         {
-            IsClassicPlayer = false;
             _videoDetail = null;
             _pgcDetail = null;
             IsDetailError = false;
@@ -511,7 +509,7 @@ namespace Richasy.Bili.ViewModels.Uwp
             await ChangeFormatAsync(formatId);
         }
 
-        private async Task InitializeLivePlayInformationAsync(LivePlayInformation livePlayInfo)
+        private void InitializeLivePlayInformationAsync(LivePlayInformation livePlayInfo)
         {
             LiveQualityCollection.Clear();
             LivePlayLineCollection.Clear();
@@ -555,7 +553,7 @@ namespace Richasy.Bili.ViewModels.Uwp
                 return;
             }
 
-            await InitializeLiveDashAsync(CurrentPlayLine.Url);
+            InitializeLiveDash(CurrentPlayLine.Url);
         }
 
         private void InitializeTimer()
@@ -646,7 +644,7 @@ namespace Richasy.Bili.ViewModels.Uwp
             }
             else
             {
-                _currentVideoPlayer.PlaybackSession.Position = TimeSpan.FromSeconds(history.Progress);
+                _currentVideoPlayer.Time = history.Progress * 1000;
             }
         }
 
@@ -657,26 +655,26 @@ namespace Richasy.Bili.ViewModels.Uwp
                 return;
             }
 
-            if (_currentVideoPlayer == null || _currentVideoPlayer.PlaybackSession == null)
+            if (_currentVideoPlayer == null || _currentVideoPlayer.Length == -1)
             {
                 return;
             }
 
-            var progress = _currentVideoPlayer.PlaybackSession.Position;
+            var progress = TimeSpan.FromMilliseconds(_currentVideoPlayer.Position * _currentVideoPlayer.Time);
             if (progress != _lastReportProgress)
             {
                 var videoId = IsPgc ? CurrentPgcEpisode.Aid : _videoId;
                 var partId = IsPgc ? CurrentPgcEpisode.PartId : GetCurrentPartId();
                 var episodeId = IsPgc ? Convert.ToInt32(EpisodeId) : 0;
                 var seasonId = IsPgc ? Convert.ToInt32(SeasonId) : 0;
-                await Controller.ReportHistoryAsync(videoId, partId, episodeId, seasonId, _currentVideoPlayer.PlaybackSession.Position);
+                await Controller.ReportHistoryAsync(videoId, partId, episodeId, seasonId, progress);
                 _lastReportProgress = progress;
             }
         }
 
         private async void OnHeartBeatTimerTickAsync(object sender, object e)
         {
-            if (_currentVideoPlayer == null || _currentVideoPlayer.PlaybackSession == null)
+            if (_currentVideoPlayer == null)
             {
                 return;
             }
@@ -691,8 +689,8 @@ namespace Richasy.Bili.ViewModels.Uwp
         {
             if (PlayerStatus == PlayerStatus.Playing && _subtitleList.Count > 0 && CanShowSubtitle)
             {
-                var progress = IsClassicPlayer ? ClassicPlayer.Position : _currentVideoPlayer.PlaybackSession.Position;
-                var sec = progress.TotalSeconds;
+                var progress = _currentVideoPlayer.Position * _currentVideoPlayer.Length;
+                var sec = progress / 1000;
                 var subtitle = _subtitleList.Where(p => p.From <= sec && p.To >= sec).FirstOrDefault();
                 if (subtitle != null && !string.IsNullOrEmpty(subtitle.Content))
                 {
@@ -706,15 +704,10 @@ namespace Richasy.Bili.ViewModels.Uwp
             }
         }
 
-        private MediaPlayer InitializeMediaPlayer()
+        private LibVLCSharp.Shared.MediaPlayer InitializeMediaPlayer()
         {
-            var player = new MediaPlayer();
-            player.MediaOpened += OnMediaPlayerOpened;
-            player.CurrentStateChanged += OnMediaPlayerCurrentStateChangedAsync;
-            player.MediaEnded += OnMediaPlayerEndedAsync;
-            player.MediaFailed += OnMediaPlayerFailedAsync;
-            player.AutoPlay = IsAutoPlay;
-            player.Volume = Volume;
+            var player = new LibVLCSharp.Shared.MediaPlayer(VLC);
+            player.Volume = Convert.ToInt32(Volume);
             player.VolumeChanged += OnMediaPlayerVolumeChangedAsync;
 
             return player;
@@ -740,39 +733,22 @@ namespace Richasy.Bili.ViewModels.Uwp
             }
         }
 
-        private async void OnMediaPlayerVolumeChangedAsync(MediaPlayer sender, object args)
+        private async void OnMediaPlayerVolumeChangedAsync(object sender, LibVLCSharp.Shared.MediaPlayerVolumeChangedEventArgs args)
         {
             await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
             {
-                Volume = sender.Volume;
+                Volume = args.Volume;
             });
         }
 
         private void OnMediaPlayerOpened(MediaPlayer sender, object args)
         {
-            var session = sender.PlaybackSession;
-            if (session != null)
-            {
-                if (IsLive && _interopMSS != null)
-                {
-                    _interopMSS.PlaybackSession = session;
-                }
-                else if (_initializeProgress != TimeSpan.Zero)
-                {
-                    session.Position = _initializeProgress;
-                    _initializeProgress = TimeSpan.Zero;
-                }
-
-                session.PlaybackRate = PlaybackRate;
-            }
-
-            var props = _currentPlaybackItem.GetDisplayProperties();
-            props.Type = Windows.Media.MediaPlaybackType.Video;
-            props.Thumbnail = Windows.Storage.Streams.RandomAccessStreamReference.CreateFromUri(new Uri(CoverUrl + "@100w_100h_1c_100q.jpg"));
-            props.VideoProperties.Title = Title;
-            props.VideoProperties.Subtitle = GetSlimDescription(IsPgc ? Subtitle : Description);
-            props.VideoProperties.Genres.Add(_videoType.ToString());
-            _currentPlaybackItem.ApplyDisplayProperties(props);
+            // var props = _currentPlaybackItem.GetDisplayProperties();
+            // props.Type = Windows.Media.MediaPlaybackType.Video;
+            // props.Thumbnail = Windows.Storage.Streams.RandomAccessStreamReference.CreateFromUri(new Uri(CoverUrl + "@100w_100h_1c_100q.jpg"));
+            // props.VideoProperties.Title = Title;
+            // props.VideoProperties.Subtitle = GetSlimDescription(IsPgc ? Subtitle : Description);
+            // props.VideoProperties.Genres.Add(_videoType.ToString());
         }
 
         private async void OnMediaPlayerFailedAsync(MediaPlayer sender, MediaPlayerFailedEventArgs args)
@@ -827,7 +803,7 @@ namespace Richasy.Bili.ViewModels.Uwp
                         currentOrder = -1;
                     }
 
-                    await ChangeLivePlayLineAsync(currentOrder + 1);
+                    ChangeLivePlayLine(currentOrder + 1);
                 }
                 else if (IsInteraction)
                 {
@@ -853,22 +829,22 @@ namespace Richasy.Bili.ViewModels.Uwp
             });
         }
 
-        private async void OnMediaPlayerCurrentStateChangedAsync(MediaPlayer sender, object args)
+        private async void OnMediaPlayerCurrentStateChangedAsync(object sender, LibVLCSharp.Shared.MediaStateChangedEventArgs args)
         {
             await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
             {
                 try
                 {
-                    switch (sender.PlaybackSession.PlaybackState)
+                    switch (args.State)
                     {
-                        case MediaPlaybackState.None:
+                        case LibVLCSharp.Shared.VLCState.NothingSpecial:
                             PlayerStatus = PlayerStatus.End;
                             break;
-                        case MediaPlaybackState.Opening:
+                        case LibVLCSharp.Shared.VLCState.Opening:
                             IsPlayInformationError = false;
                             PlayerStatus = PlayerStatus.Playing;
                             break;
-                        case MediaPlaybackState.Playing:
+                        case LibVLCSharp.Shared.VLCState.Playing:
                             PlayerStatus = PlayerStatus.Playing;
                             IsPlayInformationError = false;
                             if (!string.IsNullOrEmpty(HistoryText) && _initializeProgress == TimeSpan.Zero)
@@ -876,18 +852,17 @@ namespace Richasy.Bili.ViewModels.Uwp
                                 IsShowHistory = true;
                             }
 
-                            if (sender.PlaybackSession.Position < _initializeProgress)
-                            {
-                                sender.PlaybackSession.Position = _initializeProgress;
-                                _initializeProgress = TimeSpan.Zero;
-                            }
-
                             break;
-                        case MediaPlaybackState.Buffering:
+                        case LibVLCSharp.Shared.VLCState.Buffering:
                             PlayerStatus = PlayerStatus.Buffering;
                             break;
-                        case MediaPlaybackState.Paused:
+                        case LibVLCSharp.Shared.VLCState.Paused:
                             PlayerStatus = PlayerStatus.Pause;
+                            break;
+                        case LibVLCSharp.Shared.VLCState.Stopped:
+                        case LibVLCSharp.Shared.VLCState.Ended:
+                        case LibVLCSharp.Shared.VLCState.Error:
+                            PlayerStatus = PlayerStatus.End;
                             break;
                         default:
                             PlayerStatus = PlayerStatus.NotLoad;
@@ -899,89 +874,6 @@ namespace Richasy.Bili.ViewModels.Uwp
                     PlayerStatus = PlayerStatus.NotLoad;
                 }
             });
-        }
-
-        private async void OnClassicStateChangedAsync(object sender, RoutedEventArgs e)
-        {
-            await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-            {
-                try
-                {
-                    switch (ClassicPlayer.CurrentState)
-                    {
-                        case MediaElementState.Closed:
-                            PlayerStatus = PlayerStatus.End;
-                            break;
-                        case MediaElementState.Opening:
-                            IsPlayInformationError = false;
-                            PlayerStatus = PlayerStatus.Playing;
-                            break;
-                        case MediaElementState.Playing:
-                            PlayerStatus = PlayerStatus.Playing;
-                            IsPlayInformationError = false;
-                            if (!string.IsNullOrEmpty(HistoryText) && _initializeProgress == TimeSpan.Zero)
-                            {
-                                IsShowHistory = true;
-                            }
-
-                            if (ClassicPlayer.Position < _initializeProgress)
-                            {
-                                ClassicPlayer.Position = _initializeProgress;
-                                _initializeProgress = TimeSpan.Zero;
-                            }
-
-                            break;
-                        case MediaElementState.Buffering:
-                            PlayerStatus = PlayerStatus.Buffering;
-                            break;
-                        case MediaElementState.Paused:
-                            PlayerStatus = PlayerStatus.Pause;
-                            break;
-                        default:
-                            PlayerStatus = PlayerStatus.NotLoad;
-                            break;
-                    }
-                }
-                catch (Exception)
-                {
-                    PlayerStatus = PlayerStatus.NotLoad;
-                }
-            });
-        }
-
-        private async void OnClassicMediaEndedAsync(object sender, RoutedEventArgs e)
-        {
-            await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-            {
-                PlayerStatus = PlayerStatus.End;
-            });
-        }
-
-        private async void OnClassicMediaFailedAsync(object sender, ExceptionRoutedEventArgs e)
-        {
-            await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-            {
-                // 在视频未加载时不对报错进行处理.
-                if (PlayerStatus == PlayerStatus.NotLoad)
-                {
-                    return;
-                }
-
-                PlayerStatus = PlayerStatus.End;
-                IsPlayInformationError = true;
-                var message = e.ErrorMessage;
-                PlayInformationErrorText = message;
-                _logger.LogError(new Exception($"播放失败（经典播放器）: {message}"));
-            });
-        }
-
-        private void OnClassicMediaOpened(object sender, RoutedEventArgs e)
-        {
-            if (_initializeProgress != TimeSpan.Zero)
-            {
-                ClassicPlayer.Position = _initializeProgress;
-                _initializeProgress = TimeSpan.Zero;
-            }
         }
 
         private void OnUserLoggedOut(object sender, EventArgs e)
@@ -990,6 +882,20 @@ namespace Richasy.Bili.ViewModels.Uwp
             IsLikeChecked = false;
             IsFollow = false;
             IsFavoriteChecked = false;
+        }
+
+        /// <summary>
+        /// 获取当前的播放位置，单位为秒.
+        /// </summary>
+        /// <returns>当前播放进度.</returns>
+        private double GetCurrentPosition()
+        {
+            if (_currentVideoPlayer != null && _currentVideoPlayer.Length != -1)
+            {
+                return _currentVideoPlayer.Length * _currentVideoPlayer.Position / 1000;
+            }
+
+            return -1;
         }
     }
 }
